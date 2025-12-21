@@ -10,6 +10,11 @@
     const target = e.target as HTMLInputElement;
     metronome.updateBPM(Number(target.value));
   }
+
+  function handleVolumeChange(e: Event) {
+    const target = e.target as HTMLInputElement;
+    metronome.updateVolume(Number(target.value));
+  }
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-gray-100">
@@ -34,6 +39,27 @@
         <div class="mt-1 flex justify-between text-xs text-gray-500">
           <span>20</span>
           <span>300</span>
+        </div>
+      </div>
+
+      <!-- Volume Control -->
+      <div>
+        <label for="volume" class="mb-2 block text-sm font-medium">
+          Volume: {Math.round(metronome.volume * 100)}%
+        </label>
+        <input
+          id="volume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={metronome.volume}
+          oninput={handleVolumeChange}
+          class="w-full"
+        />
+        <div class="mt-1 flex justify-between text-xs text-gray-500">
+          <span>0%</span>
+          <span>100%</span>
         </div>
       </div>
 

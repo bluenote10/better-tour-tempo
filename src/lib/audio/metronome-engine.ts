@@ -9,6 +9,7 @@ export type SoundType = "synth1" | "synth2" | "sample";
 
 export class MetronomeEngine {
   private audioContext: AudioContext | null = null;
+  private masterGain: GainNode | null = null;
   private schedulerIntervalId: number | null = null;
   private nextNoteTime = 0;
   private currentBeat = 0;
@@ -22,6 +23,7 @@ export class MetronomeEngine {
   private bpm = 120;
   private beatsPerMeasure = 4;
   private soundType: SoundType = "synth1";
+  private volume = 0.7; // 0-1 range
   private generatedClickBuffer: AudioBuffer | null = null;
   private sampleClickBuffer: AudioBuffer | null = null;
 
@@ -29,6 +31,9 @@ export class MetronomeEngine {
 
   async init(): Promise<void> {
     this.audioContext = new AudioContext();
+    this.masterGain = this.audioContext.createGain();
+    this.masterGain.connect(this.audioContext.destination);
+    this.masterGain.gain.value = this.volume;
     // Generate click for synth2
     this.generatedClickBuffer = generateClickBuffer(this.audioContext);
     // Load WAV sample
@@ -77,12 +82,23 @@ export class MetronomeEngine {
     this.soundType = type;
   }
 
+  setVolume(volume: number): void {
+    this.volume = Math.max(0, Math.min(1, volume)); // Clamp between 0-1
+    if (this.masterGain) {
+      this.masterGain.gain.value = this.volume;
+    }
+  }
+
   getIsPlaying(): boolean {
     return this.isPlaying;
   }
 
   getBPM(): number {
     return this.bpm;
+  }
+
+  getVolume(): number {
+    return this.volume;
   }
 
   private scheduler(): void {
@@ -108,20 +124,20 @@ export class MetronomeEngine {
   }
 
   private playSynthClick(time: number, beat: number): void {
-    if (!this.audioContext) return;
+    if (!this.audioContext || !this.masterGain) return;
 
     const osc = this.audioContext.createOscillator();
     const gainNode = this.audioContext.createGain();
 
     osc.connect(gainNode);
-    gainNode.connect(this.audioContext.destination);
+    gainNode.connect(this.masterGain);
 
     // First beat of measure is accented (higher pitch)
     const frequency = beat === 0 ? 1000 : 800;
     osc.frequency.value = frequency;
 
-    // Short click envelope
-    gainNode.gain.value = 0.3;
+    // Short click envelope (normalized to match other sounds)
+    gainNode.gain.value = 1.0;
     gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.03);
 
     osc.start(time);
@@ -129,11 +145,11 @@ export class MetronomeEngine {
   }
 
   private playBufferClick(time: number, buffer: AudioBuffer): void {
-    if (!this.audioContext) return;
+    if (!this.audioContext || !this.masterGain) return;
 
     const source = this.audioContext.createBufferSource();
     source.buffer = buffer;
-    source.connect(this.audioContext.destination);
+    source.connect(this.masterGain);
     source.start(time);
   }
 

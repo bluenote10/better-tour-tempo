@@ -8,6 +8,7 @@ class MetronomeState {
   private initialized = $state(false);
 
   bpm = $state(120);
+  volume = $state(0.7);
   isPlaying = $state(false);
   soundType = $state<SoundType>("synth1");
 
@@ -37,6 +38,11 @@ class MetronomeState {
   updateBPM(newBPM: number): void {
     this.bpm = newBPM;
     this.engine.setBPM(newBPM);
+  }
+
+  updateVolume(newVolume: number): void {
+    this.volume = newVolume;
+    this.engine.setVolume(newVolume);
   }
 
   updateSoundType(type: SoundType): void {
