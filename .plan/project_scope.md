@@ -20,3 +20,7 @@ After each implementation iteration use `npm run check-all` to verify nothing br
 Keep your summary of what you did short.
 Our working style should be that I know what you'll do beforehand, so I don't need lengthy summaries.
 In particular, avoid praising your solution too much.
+
+IMPORTANT when changing your approach (e.g. because an initial attempt failed):
+- TELL ME ABOUT IT. Don't silently do something else!
+- Be very mindful of CLEANING UP the left-overs of the unsuccessful approach. We must not leave around dead left-overs from things that became obsolete.
