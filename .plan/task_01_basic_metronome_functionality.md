@@ -24,4 +24,3 @@ There are two issues with the fully static approach:
 
 Therefore we'll likely have to go for a more dynamic approach, but it would be good having to produce a literally "infinite" event sequence.
 The ideal solution would be to have a pattern of a fixed length that loops around at a certain length, but that looping has to be in perfect timing as well.
-
