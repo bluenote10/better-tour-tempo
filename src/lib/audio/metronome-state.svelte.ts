@@ -4,8 +4,7 @@ import { MetronomeEngine, type SoundType } from "./metronome-engine";
  * Svelte 5 runes-based state management for metronome
  */
 class MetronomeState {
-  private engine = new MetronomeEngine();
-  private initialized = $state(false);
+  private engine: MetronomeEngine | null = null;
 
   bpm = $state(120);
   volume = $state(0.7);
@@ -13,14 +12,13 @@ class MetronomeState {
   soundType = $state<SoundType>("synth1");
 
   async init(): Promise<void> {
-    if (!this.initialized) {
-      await this.engine.init();
-      this.initialized = true;
+    if (!this.engine) {
+      this.engine = await MetronomeEngine.create(this.volume);
     }
   }
 
   togglePlay(): void {
-    if (!this.initialized) return;
+    if (!this.engine) return;
 
     if (this.isPlaying) {
       this.engine.stop();
@@ -33,21 +31,29 @@ class MetronomeState {
 
   updateBPM(newBPM: number): void {
     this.bpm = newBPM;
-    this.engine.setBPM(newBPM);
+    if (this.engine) {
+      this.engine.setBPM(newBPM);
+    }
   }
 
   updateVolume(newVolume: number): void {
     this.volume = newVolume;
-    this.engine.setVolume(newVolume);
+    if (this.engine) {
+      this.engine.setVolume(newVolume);
+    }
   }
 
   updateSoundType(type: SoundType): void {
     this.soundType = type;
-    this.engine.setSoundType(type);
+    if (this.engine) {
+      this.engine.setSoundType(type);
+    }
   }
 
   destroy(): void {
-    this.engine.destroy();
+    if (this.engine) {
+      this.engine.destroy();
+    }
   }
 }
 
