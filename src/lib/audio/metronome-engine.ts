@@ -5,7 +5,7 @@
 
 import { generateClickBuffer } from "./generate-click";
 
-export type SoundType = "synth" | "sample";
+export type SoundType = "synth1" | "synth2" | "sample";
 
 export class MetronomeEngine {
   private audioContext: AudioContext | null = null;
@@ -21,15 +21,18 @@ export class MetronomeEngine {
   // Metronome parameters
   private bpm = 120;
   private beatsPerMeasure = 4;
-  private soundType: SoundType = "synth";
-  private clickBuffer: AudioBuffer | null = null;
+  private soundType: SoundType = "synth1";
+  private generatedClickBuffer: AudioBuffer | null = null;
+  private sampleClickBuffer: AudioBuffer | null = null;
 
   constructor() {}
 
   async init(): Promise<void> {
     this.audioContext = new AudioContext();
-    // Generate default click sample
-    this.clickBuffer = generateClickBuffer(this.audioContext);
+    // Generate click for synth2
+    this.generatedClickBuffer = generateClickBuffer(this.audioContext);
+    // Load WAV sample
+    await this.loadClickSample("/548508__perc_clicktoy_hi.wav");
   }
 
   async loadClickSample(url: string): Promise<void> {
@@ -37,7 +40,7 @@ export class MetronomeEngine {
 
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
-    this.clickBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    this.sampleClickBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
   }
 
   start(): void {
@@ -95,10 +98,12 @@ export class MetronomeEngine {
   private scheduleNote(time: number, beat: number): void {
     if (!this.audioContext) return;
 
-    if (this.soundType === "synth") {
+    if (this.soundType === "synth1") {
       this.playSynthClick(time, beat);
-    } else if (this.soundType === "sample" && this.clickBuffer) {
-      this.playSampleClick(time);
+    } else if (this.soundType === "synth2" && this.generatedClickBuffer) {
+      this.playBufferClick(time, this.generatedClickBuffer);
+    } else if (this.soundType === "sample" && this.sampleClickBuffer) {
+      this.playBufferClick(time, this.sampleClickBuffer);
     }
   }
 
@@ -123,11 +128,11 @@ export class MetronomeEngine {
     osc.stop(time + 0.03);
   }
 
-  private playSampleClick(time: number): void {
-    if (!this.audioContext || !this.clickBuffer) return;
+  private playBufferClick(time: number, buffer: AudioBuffer): void {
+    if (!this.audioContext) return;
 
     const source = this.audioContext.createBufferSource();
-    source.buffer = this.clickBuffer;
+    source.buffer = buffer;
     source.connect(this.audioContext.destination);
     source.start(time);
   }

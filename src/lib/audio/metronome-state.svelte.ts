@@ -9,7 +9,7 @@ class MetronomeState {
 
   bpm = $state(120);
   isPlaying = $state(false);
-  soundType = $state<SoundType>("synth");
+  soundType = $state<SoundType>("synth1");
 
   async init(): Promise<void> {
     if (!this.initialized) {
