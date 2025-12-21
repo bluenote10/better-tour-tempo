@@ -15,7 +15,7 @@ export function generateClickBuffer(audioContext: AudioContext): AudioBuffer {
     const frequency = 1200;
     const decay = Math.exp(-t * 100);
 
-    channelData[i] = Math.sin(2 * Math.PI * frequency * t) * decay * 0.5;
+    channelData[i] = Math.sin(2 * Math.PI * frequency * t) * decay;
   }
 
   return buffer;

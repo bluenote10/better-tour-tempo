@@ -137,7 +137,7 @@ export class MetronomeEngine {
     osc.frequency.value = frequency;
 
     // Short click envelope (normalized to match other sounds)
-    gainNode.gain.value = 1.0;
+    gainNode.gain.setValueAtTime(1.0, time);
     gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.03);
 
     osc.start(time);
