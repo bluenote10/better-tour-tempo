@@ -8,10 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "format": "prettier --write .",
-    "lint": "prettier --check . && eslint ."
+    "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "typecheck-watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "prettier --check .",
+    "format-write": "prettier --write .",
+    "lint": "prettier --check . && eslint .",
+    "check-all": "npm run format-write && npm run lint && npm run typecheck"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
