@@ -7,9 +7,15 @@ import { generateClickBuffer } from "./generate-click";
 
 export type SoundType = "synth1" | "synth2" | "sample";
 
+interface Context {
+  audioContext: AudioContext;
+  masterGain: GainNode;
+  generatedClickBuffer: AudioBuffer;
+  sampleClickBuffer: AudioBuffer;
+}
+
 export class MetronomeEngine {
-  private audioContext: AudioContext | null = null;
-  private masterGain: GainNode | null = null;
+  private context: Context | null = null;
   private schedulerIntervalId: number | null = null;
   private nextNoteTime = 0;
   private currentBeat = 0;
@@ -24,42 +30,50 @@ export class MetronomeEngine {
   private beatsPerMeasure = 4;
   private soundType: SoundType = "synth1";
   private volume = 0.7; // 0-1 range
-  private generatedClickBuffer: AudioBuffer | null = null;
-  private sampleClickBuffer: AudioBuffer | null = null;
 
   constructor() {}
 
   async init(): Promise<void> {
-    this.audioContext = new AudioContext();
-    this.masterGain = this.audioContext.createGain();
-    this.masterGain.connect(this.audioContext.destination);
-    this.masterGain.gain.value = this.volume;
-    // Generate click for synth2
-    this.generatedClickBuffer = generateClickBuffer(this.audioContext);
-    // Load WAV sample
-    await this.loadClickSample("/548508__perc_clicktoy_hi.wav");
+    const audioContext = new AudioContext();
+    const masterGain = audioContext.createGain();
+    masterGain.connect(audioContext.destination);
+    masterGain.gain.value = this.volume;
+
+    const generatedClickBuffer = generateClickBuffer(audioContext);
+    const sampleClickBuffer = await MetronomeEngine.loadClickSample(
+      audioContext,
+      "/548508__perc_clicktoy_hi.wav",
+    );
+
+    this.context = {
+      audioContext,
+      masterGain,
+      generatedClickBuffer,
+      sampleClickBuffer,
+    };
   }
 
-  async loadClickSample(url: string): Promise<void> {
-    if (!this.audioContext) throw new Error("AudioContext not initialized");
-
+  private static async loadClickSample(
+    audioContext: AudioContext,
+    url: string,
+  ): Promise<AudioBuffer> {
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
-    this.sampleClickBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+    return await audioContext.decodeAudioData(arrayBuffer);
   }
 
   start(): void {
     if (this.isPlaying) return;
-    if (!this.audioContext) throw new Error("AudioContext not initialized");
+    if (!this.context) throw new Error("AudioContext not initialized");
 
     // Resume AudioContext if suspended (required by browser autoplay policies)
-    if (this.audioContext.state === "suspended") {
-      this.audioContext.resume();
+    if (this.context.audioContext.state === "suspended") {
+      this.context.audioContext.resume();
     }
 
     this.isPlaying = true;
     this.currentBeat = 0;
-    this.nextNoteTime = this.audioContext.currentTime;
+    this.nextNoteTime = this.context.audioContext.currentTime;
 
     this.schedulerIntervalId = window.setInterval(() => {
       this.scheduler();
@@ -84,8 +98,8 @@ export class MetronomeEngine {
 
   setVolume(volume: number): void {
     this.volume = Math.max(0, Math.min(1, volume)); // Clamp between 0-1
-    if (this.masterGain) {
-      this.masterGain.gain.value = this.volume;
+    if (this.context) {
+      this.context.masterGain.gain.value = this.volume;
     }
   }
 
@@ -102,35 +116,35 @@ export class MetronomeEngine {
   }
 
   private scheduler(): void {
-    if (!this.audioContext) return;
+    if (!this.context) return;
 
     // Schedule all notes that need to play before the next interval
-    while (this.nextNoteTime < this.audioContext.currentTime + this.scheduleAheadTime) {
+    while (this.nextNoteTime < this.context.audioContext.currentTime + this.scheduleAheadTime) {
       this.scheduleNote(this.nextNoteTime, this.currentBeat);
       this.advanceNote();
     }
   }
 
   private scheduleNote(time: number, beat: number): void {
-    if (!this.audioContext) return;
+    if (!this.context) return;
 
     if (this.soundType === "synth1") {
       this.playSynthClick(time, beat);
-    } else if (this.soundType === "synth2" && this.generatedClickBuffer) {
-      this.playBufferClick(time, this.generatedClickBuffer);
-    } else if (this.soundType === "sample" && this.sampleClickBuffer) {
-      this.playBufferClick(time, this.sampleClickBuffer);
+    } else if (this.soundType === "synth2") {
+      this.playBufferClick(time, this.context.generatedClickBuffer);
+    } else if (this.soundType === "sample") {
+      this.playBufferClick(time, this.context.sampleClickBuffer);
     }
   }
 
   private playSynthClick(time: number, beat: number): void {
-    if (!this.audioContext || !this.masterGain) return;
+    if (!this.context) return;
 
-    const osc = this.audioContext.createOscillator();
-    const gainNode = this.audioContext.createGain();
+    const osc = this.context.audioContext.createOscillator();
+    const gainNode = this.context.audioContext.createGain();
 
     osc.connect(gainNode);
-    gainNode.connect(this.masterGain);
+    gainNode.connect(this.context.masterGain);
 
     // First beat of measure is accented (higher pitch)
     const frequency = beat === 0 ? 1000 : 800;
@@ -145,11 +159,11 @@ export class MetronomeEngine {
   }
 
   private playBufferClick(time: number, buffer: AudioBuffer): void {
-    if (!this.audioContext || !this.masterGain) return;
+    if (!this.context) return;
 
-    const source = this.audioContext.createBufferSource();
+    const source = this.context.audioContext.createBufferSource();
     source.buffer = buffer;
-    source.connect(this.masterGain);
+    source.connect(this.context.masterGain);
     source.start(time);
   }
 
@@ -166,9 +180,9 @@ export class MetronomeEngine {
 
   destroy(): void {
     this.stop();
-    if (this.audioContext) {
-      this.audioContext.close();
-      this.audioContext = null;
+    if (this.context) {
+      this.context.audioContext.close();
+      this.context = null;
     }
   }
 }

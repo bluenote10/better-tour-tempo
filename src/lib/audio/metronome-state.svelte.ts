@@ -19,10 +19,6 @@ class MetronomeState {
     }
   }
 
-  async loadSample(url: string): Promise<void> {
-    await this.engine.loadClickSample(url);
-  }
-
   togglePlay(): void {
     if (!this.initialized) return;
 
