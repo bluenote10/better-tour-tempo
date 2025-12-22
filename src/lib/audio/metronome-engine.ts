@@ -74,7 +74,7 @@ export class MetronomeEngine {
     return new MetronomeEngine(audioContext, masterGain, buffers, sequence);
   }
 
-  private static getFileUrl(clickType: FileBasedClickType): string {
+  static getFileUrl(clickType: FileBasedClickType): string {
     switch (clickType) {
       case "hi-hat1":
         return "/185211__casmarrav__retro-hi-hat.wav";
