@@ -4,6 +4,8 @@
  */
 
 import { generateClickBuffer } from "./generate-click";
+import { ClickIterator } from "./click-iterator";
+import type { Sequence } from "./sequence";
 
 export type SoundType = "synth1" | "synth2" | "sample";
 
@@ -12,10 +14,11 @@ export class MetronomeEngine {
   private readonly masterGain: GainNode;
   private readonly generatedClickBuffer: AudioBuffer;
   private readonly sampleClickBuffer: AudioBuffer;
+  private readonly clickIterator: ClickIterator;
 
   private schedulerIntervalId: number | null = null;
-  private nextNoteTime = 0;
   private currentBeat = 0;
+  private lastScheduleTime = 0;
   private isPlaying = false;
 
   // Scheduling parameters
@@ -24,22 +27,22 @@ export class MetronomeEngine {
 
   // Metronome parameters
   private bpm = 120;
-  private beatsPerMeasure = 4;
-  private soundType: SoundType = "synth1";
 
   private constructor(
     audioContext: AudioContext,
     masterGain: GainNode,
     generatedClickBuffer: AudioBuffer,
     sampleClickBuffer: AudioBuffer,
+    sequence: Sequence,
   ) {
     this.audioContext = audioContext;
     this.masterGain = masterGain;
     this.generatedClickBuffer = generatedClickBuffer;
     this.sampleClickBuffer = sampleClickBuffer;
+    this.clickIterator = new ClickIterator(sequence);
   }
 
-  static async create(initialVolume: number): Promise<MetronomeEngine> {
+  static async create(initialVolume: number, sequence: Sequence): Promise<MetronomeEngine> {
     const audioContext = new AudioContext();
     const masterGain = audioContext.createGain();
     masterGain.connect(audioContext.destination);
@@ -51,7 +54,13 @@ export class MetronomeEngine {
       "/548508__perc_clicktoy_hi.wav",
     );
 
-    return new MetronomeEngine(audioContext, masterGain, generatedClickBuffer, sampleClickBuffer);
+    return new MetronomeEngine(
+      audioContext,
+      masterGain,
+      generatedClickBuffer,
+      sampleClickBuffer,
+      sequence,
+    );
   }
 
   private static async loadClickSample(
@@ -73,7 +82,8 @@ export class MetronomeEngine {
 
     this.isPlaying = true;
     this.currentBeat = 0;
-    this.nextNoteTime = this.audioContext.currentTime;
+    this.lastScheduleTime = this.audioContext.currentTime;
+    this.clickIterator.reset();
 
     this.schedulerIntervalId = window.setInterval(() => {
       this.scheduler();
@@ -92,10 +102,6 @@ export class MetronomeEngine {
     this.bpm = Math.max(20, Math.min(300, bpm)); // Clamp between 20-300
   }
 
-  setSoundType(type: SoundType): void {
-    this.soundType = type;
-  }
-
   setVolume(volume: number): void {
     const clampedVolume = Math.max(0, Math.min(1, volume)); // Clamp between 0-1
     this.masterGain.gain.value = clampedVolume;
@@ -110,58 +116,80 @@ export class MetronomeEngine {
   }
 
   private scheduler(): void {
-    // Schedule all notes that need to play before the next interval
-    while (this.nextNoteTime < this.audioContext.currentTime + this.scheduleAheadTime) {
-      this.scheduleNote(this.nextNoteTime, this.currentBeat);
-      this.advanceNote();
+    const currentTime = this.audioContext.currentTime;
+
+    // BPM CHANGE HANDLING:
+    // We cannot simply convert total elapsed audio time to beats using current BPM,
+    // because BPM may have changed during playback. Instead, we:
+    // 1. Track only the delta time since last scheduling
+    // 2. Convert that delta using current BPM (assuming BPM is stable within ~25ms)
+    // 3. Accumulate to currentBeat for absolute beat position
+    // This ensures BPM changes don't cause jumps in the beat timeline.
+    const deltaTime = currentTime - this.lastScheduleTime;
+    const secondsPerBeat = 60.0 / this.bpm;
+    const deltaBeat = deltaTime / secondsPerBeat;
+
+    // Update current beat position based on elapsed time
+    this.currentBeat += deltaBeat;
+
+    // Calculate beat range to schedule (look ahead by scheduleAheadTime)
+    const beatUpto = this.currentBeat + this.scheduleAheadTime / secondsPerBeat;
+
+    // Get clicks with absolute beat positions
+    const clicks = this.clickIterator.getClicksUpto(beatUpto);
+
+    // Schedule each click at its absolute audio time
+    for (const click of clicks) {
+      // Convert click's absolute beat to audio time
+      const clickTime = currentTime + (click.beat - this.currentBeat) * secondsPerBeat;
+      this.scheduleClick(clickTime, click);
+    }
+
+    // Update last schedule time
+    this.lastScheduleTime = currentTime;
+  }
+
+  private scheduleClick(time: number, click: { soundType: SoundType; volume: number }): void {
+    const buffer =
+      click.soundType === "synth2" ? this.generatedClickBuffer : this.sampleClickBuffer;
+
+    if (click.soundType === "synth1") {
+      this.playSynthClick(time, click.volume);
+    } else {
+      this.playBufferClick(time, buffer, click.volume);
     }
   }
 
-  private scheduleNote(time: number, beat: number): void {
-    if (this.soundType === "synth1") {
-      this.playSynthClick(time, beat);
-    } else if (this.soundType === "synth2") {
-      this.playBufferClick(time, this.generatedClickBuffer);
-    } else if (this.soundType === "sample") {
-      this.playBufferClick(time, this.sampleClickBuffer);
-    }
-  }
-
-  private playSynthClick(time: number, beat: number): void {
+  private playSynthClick(time: number, volume: number): void {
     const osc = this.audioContext.createOscillator();
     const gainNode = this.audioContext.createGain();
 
     osc.connect(gainNode);
     gainNode.connect(this.masterGain);
 
-    // First beat of measure is accented (higher pitch)
-    const frequency = beat === 0 ? 1000 : 800;
-    osc.frequency.value = frequency;
+    // Fixed frequency - no accent logic
+    osc.frequency.value = 880;
 
-    // Short click envelope (normalized to match other sounds)
-    gainNode.gain.setValueAtTime(1.0, time);
+    // Short click envelope with per-click volume
+    gainNode.gain.setValueAtTime(volume, time);
     gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.03);
 
     osc.start(time);
     osc.stop(time + 0.03);
   }
 
-  private playBufferClick(time: number, buffer: AudioBuffer): void {
+  private playBufferClick(time: number, buffer: AudioBuffer, volume: number): void {
     const source = this.audioContext.createBufferSource();
+    const gainNode = this.audioContext.createGain();
+
     source.buffer = buffer;
-    source.connect(this.masterGain);
+    source.connect(gainNode);
+    gainNode.connect(this.masterGain);
+
+    // Apply per-click volume
+    gainNode.gain.value = volume;
+
     source.start(time);
-  }
-
-  private advanceNote(): void {
-    // Calculate seconds per beat
-    const secondsPerBeat = 60.0 / this.bpm;
-
-    // Advance to next note
-    this.nextNoteTime += secondsPerBeat;
-
-    // Advance beat counter (circular within measure)
-    this.currentBeat = (this.currentBeat + 1) % this.beatsPerMeasure;
   }
 
   destroy(): void {

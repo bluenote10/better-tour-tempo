@@ -1,4 +1,5 @@
-import { MetronomeEngine, type SoundType } from "./metronome-engine";
+import { MetronomeEngine } from "./metronome-engine";
+import { createDefault4BeatSequence } from "./default-sequence";
 
 /**
  * Svelte 5 runes-based state management for metronome
@@ -9,11 +10,11 @@ class MetronomeState {
   bpm = $state(120);
   volume = $state(0.7);
   isPlaying = $state(false);
-  soundType = $state<SoundType>("synth1");
 
   async init(): Promise<void> {
     if (!this.engine) {
-      this.engine = await MetronomeEngine.create(this.volume);
+      const sequence = createDefault4BeatSequence();
+      this.engine = await MetronomeEngine.create(this.volume, sequence);
     }
   }
 
@@ -40,13 +41,6 @@ class MetronomeState {
     this.volume = newVolume;
     if (this.engine) {
       this.engine.setVolume(newVolume);
-    }
-  }
-
-  updateSoundType(type: SoundType): void {
-    this.soundType = type;
-    if (this.engine) {
-      this.engine.setSoundType(type);
     }
   }
 

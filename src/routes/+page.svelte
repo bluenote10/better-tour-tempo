@@ -63,37 +63,6 @@
         </div>
       </div>
 
-      <!-- Sound Type Selector -->
-      <div>
-        <div class="mb-2 block text-sm font-medium">Sound Type</div>
-        <div class="flex gap-2">
-          <button
-            onclick={() => metronome.updateSoundType("synth1")}
-            class="flex-1 rounded px-4 py-2 {metronome.soundType === 'synth1'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200'}"
-          >
-            Synth (1)
-          </button>
-          <button
-            onclick={() => metronome.updateSoundType("synth2")}
-            class="flex-1 rounded px-4 py-2 {metronome.soundType === 'synth2'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200'}"
-          >
-            Synth (2)
-          </button>
-          <button
-            onclick={() => metronome.updateSoundType("sample")}
-            class="flex-1 rounded px-4 py-2 {metronome.soundType === 'sample'
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200'}"
-          >
-            Sample
-          </button>
-        </div>
-      </div>
-
       <!-- Play/Stop Button -->
       <button
         onclick={() => metronome.togglePlay()}
