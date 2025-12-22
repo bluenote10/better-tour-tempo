@@ -66,5 +66,6 @@ export class ClickIterator {
   reset(): void {
     this.currentIndex = 0;
     this.loopCount = 0;
+    this.lastBeatUpto = 0;
   }
 }

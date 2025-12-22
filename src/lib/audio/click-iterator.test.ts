@@ -248,6 +248,29 @@ describe("ClickIterator", () => {
       expect(clicks[0].beat).toBe(0);
       expect(clicks[1].beat).toBe(1);
     });
+
+    it("should work after reset from far ahead position", () => {
+      const sequence: Sequence = {
+        clicks: [
+          { soundType: "synth1", beat: 0, volume: 1.0 },
+          { soundType: "synth1", beat: 1, volume: 1.0 },
+        ],
+        maxBeat: 4,
+      };
+
+      const iterator = new ClickIterator(sequence);
+
+      // Advance far ahead
+      iterator.getClicksUpto(100);
+
+      // Reset and query from beginning
+      iterator.reset();
+
+      const clicks = iterator.getClicksUpto(2);
+      expect(clicks).toHaveLength(2);
+      expect(clicks[0].beat).toBe(0);
+      expect(clicks[1].beat).toBe(1);
+    });
   });
 
   describe("non-monotonic access", () => {
