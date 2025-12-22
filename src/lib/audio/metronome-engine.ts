@@ -5,7 +5,13 @@
 
 import { generateClickBuffer } from "./generate-click";
 import { ClickIterator } from "./click-iterator";
-import type { Sequence, ClickType, BufferBasedClickType, FileBasedClickType } from "./sequence";
+import {
+  type Sequence,
+  type BufferBasedClickType,
+  type FileBasedClickType,
+  FILE_BASED_TYPES,
+  type Click,
+} from "./sequence";
 import { assertNever } from "$lib/typing-utils";
 
 export class MetronomeEngine {
@@ -50,28 +56,8 @@ export class MetronomeEngine {
     buffers.set("synth2", generateClickBuffer(audioContext));
 
     // Load all file-based samples
-    const fileBasedTypes: FileBasedClickType[] = [
-      "hi-hat1",
-      "hi-hat2",
-      "hi-hat3",
-      "hi-hat4",
-      "hi-hat5",
-      "hi-hat6",
-      "perc_clicktoy",
-      "perc_glass",
-      "perc_metronomequartz",
-      "perc_stick",
-      "synth_block_e",
-      "synth_square_d",
-      "synth_square_e",
-      "synth_tick_b",
-      "synth_tick_c",
-      "synth_tick_e",
-      "synth_tick_h",
-    ];
-
     await Promise.all(
-      fileBasedTypes.map(async (clickType) => {
+      FILE_BASED_TYPES.map(async (clickType) => {
         const url = MetronomeEngine.getFileUrl(clickType);
         try {
           const buffer = await MetronomeEngine.loadClickSample(audioContext, url);
@@ -222,21 +208,19 @@ export class MetronomeEngine {
     this.lastScheduleTime = currentTime;
   }
 
-  private scheduleClick(time: number, click: { soundType: ClickType; volume: number }): void {
-    const clickType = click.soundType;
-
-    if (clickType === "synth1") {
-      this.playSynthClick(time, click.volume);
+  private scheduleClick(time: number, click: Click): void {
+    if (click.type === "synth1") {
+      this.scheduleSynthClick(time, click.volume);
     } else {
-      const buffer = this.buffers.get(clickType);
+      const buffer = this.buffers.get(click.type);
       if (!buffer) {
-        throw new Error(`Buffer not found for click type: ${clickType}`);
+        throw new Error(`Buffer not found for click type: ${click.type}`);
       }
-      this.playBufferClick(time, buffer, click.volume);
+      this.scheduleBufferClick(time, buffer, click.volume);
     }
   }
 
-  private playSynthClick(time: number, volume: number): void {
+  private scheduleSynthClick(time: number, volume: number): void {
     const osc = this.audioContext.createOscillator();
     const gainNode = this.audioContext.createGain();
 
@@ -254,7 +238,7 @@ export class MetronomeEngine {
     osc.stop(time + 0.03);
   }
 
-  private playBufferClick(time: number, buffer: AudioBuffer, volume: number): void {
+  private scheduleBufferClick(time: number, buffer: AudioBuffer, volume: number): void {
     const source = this.audioContext.createBufferSource();
     const gainNode = this.audioContext.createGain();
 

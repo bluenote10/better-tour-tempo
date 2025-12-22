@@ -7,9 +7,9 @@ describe("ClickIterator", () => {
     it("should return clicks in order", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
-          { soundType: "synth1", beat: 2, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -32,9 +32,9 @@ describe("ClickIterator", () => {
     it("should handle unsorted input by sorting", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 2, volume: 1.0 },
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 2, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -50,7 +50,7 @@ describe("ClickIterator", () => {
 
     it("should return empty array when no clicks in range", () => {
       const sequence: Sequence = {
-        clicks: [{ soundType: "synth1", beat: 2, volume: 1.0 }],
+        clicks: [{ type: "synth1", beat: 2, volume: 1.0 }],
         maxBeat: 4,
       };
 
@@ -62,9 +62,9 @@ describe("ClickIterator", () => {
     it("should handle multiple clicks in single query", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
-          { soundType: "synth1", beat: 2, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -79,10 +79,10 @@ describe("ClickIterator", () => {
     it("should wrap around when crossing maxBeat", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
-          { soundType: "synth1", beat: 2, volume: 1.0 },
-          { soundType: "synth1", beat: 3, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 2, volume: 1.0 },
+          { type: "synth1", beat: 3, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -105,9 +105,9 @@ describe("ClickIterator", () => {
     it("should handle partial wrap-around", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
-          { soundType: "synth1", beat: 2, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -127,8 +127,8 @@ describe("ClickIterator", () => {
     it("should handle multiple complete loops", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 2,
       };
@@ -143,8 +143,8 @@ describe("ClickIterator", () => {
     it("should handle multiple complete loops plus partial", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 2,
       };
@@ -171,7 +171,7 @@ describe("ClickIterator", () => {
 
     it("should handle maxBeat of 0", () => {
       const sequence: Sequence = {
-        clicks: [{ soundType: "synth1", beat: 0, volume: 1.0 }],
+        clicks: [{ type: "synth1", beat: 0, volume: 1.0 }],
         maxBeat: 0,
       };
 
@@ -182,7 +182,7 @@ describe("ClickIterator", () => {
 
     it("should handle querying same beat twice", () => {
       const sequence: Sequence = {
-        clicks: [{ soundType: "synth1", beat: 0, volume: 1.0 }],
+        clicks: [{ type: "synth1", beat: 0, volume: 1.0 }],
         maxBeat: 4,
       };
 
@@ -195,8 +195,8 @@ describe("ClickIterator", () => {
     it("should handle clicks at exact maxBeat boundary", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 3.99, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 3.99, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -209,9 +209,9 @@ describe("ClickIterator", () => {
     it("should preserve click properties (soundType, volume)", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 0.5 },
-          { soundType: "synth2", beat: 1, volume: 0.8 },
-          { soundType: "hi-hat1", beat: 2, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 0.5 },
+          { type: "synth2", beat: 1, volume: 0.8 },
+          { type: "hi-hat1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -219,11 +219,11 @@ describe("ClickIterator", () => {
       const iterator = new ClickIterator(sequence);
       const clicks = iterator.getClicksUpto(3);
 
-      expect(clicks[0].soundType).toBe("synth1");
+      expect(clicks[0].type).toBe("synth1");
       expect(clicks[0].volume).toBe(0.5);
-      expect(clicks[1].soundType).toBe("synth2");
+      expect(clicks[1].type).toBe("synth2");
       expect(clicks[1].volume).toBe(0.8);
-      expect(clicks[2].soundType).toBe("hi-hat1");
+      expect(clicks[2].type).toBe("hi-hat1");
       expect(clicks[2].volume).toBe(1.0);
     });
   });
@@ -232,8 +232,8 @@ describe("ClickIterator", () => {
     it("should reset state to beginning", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -252,8 +252,8 @@ describe("ClickIterator", () => {
     it("should work after reset from far ahead position", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -277,9 +277,9 @@ describe("ClickIterator", () => {
     it("should return empty array when beatUpto goes backwards", () => {
       const sequence: Sequence = {
         clicks: [
-          { soundType: "synth1", beat: 0, volume: 1.0 },
-          { soundType: "synth1", beat: 1, volume: 1.0 },
-          { soundType: "synth1", beat: 2, volume: 1.0 },
+          { type: "synth1", beat: 0, volume: 1.0 },
+          { type: "synth1", beat: 1, volume: 1.0 },
+          { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
       };
