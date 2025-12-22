@@ -5,6 +5,7 @@ export class ClickIterator {
   private readonly maxBeat: number;
   private currentIndex = 0;
   private loopCount = 0;
+  private lastBeatUpto = 0;
 
   constructor(sequence: Sequence) {
     // Sort clicks by beat time for efficient iteration
@@ -17,8 +18,16 @@ export class ClickIterator {
    * Returned clicks have their 'beat' field set to absolute beat positions.
    * Updates internal state for next call.
    * NOTE: beatUpto must be >= last beatUpto (monotonically increasing).
+   * If beatUpto < last beatUpto, returns empty array without updating state.
    */
   getClicksUpto(beatUpto: number): Click[] {
+    // Non-monotonic check - return empty without updating state
+    if (beatUpto < this.lastBeatUpto) {
+      return [];
+    }
+
+    this.lastBeatUpto = beatUpto;
+
     if (this.maxBeat === 0 || this.sortedClicks.length === 0) {
       return [];
     }

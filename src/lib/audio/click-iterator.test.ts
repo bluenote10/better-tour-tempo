@@ -249,4 +249,33 @@ describe("ClickIterator", () => {
       expect(clicks[1].beat).toBe(1);
     });
   });
+
+  describe("non-monotonic access", () => {
+    it("should return empty array when beatUpto goes backwards", () => {
+      const sequence: Sequence = {
+        clicks: [
+          { soundType: "synth1", beat: 0, volume: 1.0 },
+          { soundType: "synth1", beat: 1, volume: 1.0 },
+          { soundType: "synth1", beat: 2, volume: 1.0 },
+        ],
+        maxBeat: 4,
+      };
+
+      const iterator = new ClickIterator(sequence);
+
+      // Advance to beat 3
+      const clicks1 = iterator.getClicksUpto(3);
+      expect(clicks1).toHaveLength(3);
+
+      // Try to go backwards to beat 2 - should return empty without changing state
+      const clicks2 = iterator.getClicksUpto(2);
+      expect(clicks2).toHaveLength(0);
+
+      // Verify state wasn't corrupted - continuing forward should work
+      const clicks3 = iterator.getClicksUpto(6);
+      expect(clicks3).toHaveLength(2); // beats 4 and 5 (no beat 3 in pattern)
+      expect(clicks3[0].beat).toBe(4);
+      expect(clicks3[1].beat).toBe(5);
+    });
+  });
 });
