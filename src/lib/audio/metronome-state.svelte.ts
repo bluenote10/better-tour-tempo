@@ -1,5 +1,5 @@
 import { MetronomeEngine } from "./metronome-engine";
-import { create3To1RatioSequence } from "./default-sequence";
+import { create3To1RatioSequence } from "./generate-sequence";
 import type { Sequence } from "./sequence";
 
 /**

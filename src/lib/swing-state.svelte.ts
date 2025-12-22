@@ -1,5 +1,5 @@
 import { metronome } from "./audio/metronome-state.svelte";
-import { create2To1RatioSequence, create3To1RatioSequence } from "./audio/default-sequence";
+import { create2To1RatioSequence, create3To1RatioSequence } from "./audio/generate-sequence";
 import { msToBPM, frameNotationToMs } from "./audio/timing-utils";
 import type { Sequence } from "./audio/sequence";
 
@@ -31,8 +31,18 @@ class SwingState {
   }
 
   async setRatioMode(mode: 2 | 3): Promise<void> {
+    // Preserve total swing time when switching modes
+    const currentTotal = this.totalSwingMs;
     this.ratioMode = mode;
+
+    // Recalculate forward time to maintain same total
+    // For 2:1: total = 2×forward + forward = 3×forward, so forward = total/3
+    // For 3:1: total = 3×forward + forward = 4×forward, so forward = total/4
+    const divisor = mode + 1;
+    this.forwardSwingMs = currentTotal / divisor;
+
     await metronome.switchSequence(this.currentSequence);
+    metronome.updateBPM(this.internalBPM);
   }
 
   async setForwardSwingMs(ms: number): Promise<void> {
