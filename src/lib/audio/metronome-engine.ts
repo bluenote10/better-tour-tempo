@@ -99,7 +99,7 @@ export class MetronomeEngine {
   }
 
   setBPM(bpm: number): void {
-    this.bpm = Math.max(20, Math.min(300, bpm)); // Clamp between 20-300
+    this.bpm = bpm;
   }
 
   setVolume(volume: number): void {
