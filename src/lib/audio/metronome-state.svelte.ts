@@ -1,5 +1,5 @@
 import { MetronomeEngine } from "./metronome-engine";
-import { createDefault4BeatSequence } from "./default-sequence";
+import { create3To1RatioSequence } from "./default-sequence";
 
 /**
  * Svelte 5 runes-based state management for metronome
@@ -13,7 +13,7 @@ class MetronomeState {
 
   async init(): Promise<void> {
     if (!this.engine) {
-      const sequence = createDefault4BeatSequence();
+      const sequence = create3To1RatioSequence();
       this.engine = await MetronomeEngine.create(this.volume, sequence);
     }
   }
