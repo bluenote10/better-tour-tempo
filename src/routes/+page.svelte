@@ -51,7 +51,7 @@
           id="volume"
           type="range"
           min="0"
-          max="1"
+          max="2.0"
           step="0.01"
           value={metronome.volume}
           oninput={handleVolumeChange}

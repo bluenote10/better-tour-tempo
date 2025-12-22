@@ -8,7 +8,7 @@ class MetronomeState {
   private engine: MetronomeEngine | null = null;
 
   bpm = $state(120);
-  volume = $state(0.7);
+  volume = $state(1.0);
   isPlaying = $state(false);
 
   async init(): Promise<void> {

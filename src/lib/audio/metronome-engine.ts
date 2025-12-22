@@ -103,8 +103,7 @@ export class MetronomeEngine {
   }
 
   setVolume(volume: number): void {
-    const clampedVolume = Math.max(0, Math.min(1, volume)); // Clamp between 0-1
-    this.masterGain.gain.value = clampedVolume;
+    this.masterGain.gain.value = volume;
   }
 
   getIsPlaying(): boolean {
@@ -116,6 +115,15 @@ export class MetronomeEngine {
   }
 
   private scheduler(): void {
+    const secondsPerBeat = 60.0 / this.bpm;
+
+    function timeToBeat(time: number): number {
+      return time / secondsPerBeat;
+    }
+    function beatToTime(beat: number): number {
+      return beat * secondsPerBeat;
+    }
+
     const currentTime = this.audioContext.currentTime;
 
     // BPM CHANGE HANDLING:
@@ -126,14 +134,13 @@ export class MetronomeEngine {
     // 3. Accumulate to currentBeat for absolute beat position
     // This ensures BPM changes don't cause jumps in the beat timeline.
     const deltaTime = currentTime - this.lastScheduleTime;
-    const secondsPerBeat = 60.0 / this.bpm;
-    const deltaBeat = deltaTime / secondsPerBeat;
+    const deltaBeat = timeToBeat(deltaTime);
 
     // Update current beat position based on elapsed time
     this.currentBeat += deltaBeat;
 
     // Calculate beat range to schedule (look ahead by scheduleAheadTime)
-    const beatUpto = this.currentBeat + this.scheduleAheadTime / secondsPerBeat;
+    const beatUpto = this.currentBeat + timeToBeat(this.scheduleAheadTime);
 
     // Get clicks with absolute beat positions
     const clicks = this.clickIterator.getClicksUpto(beatUpto);
@@ -141,7 +148,7 @@ export class MetronomeEngine {
     // Schedule each click at its absolute audio time
     for (const click of clicks) {
       // Convert click's absolute beat to audio time
-      const clickTime = currentTime + (click.beat - this.currentBeat) * secondsPerBeat;
+      const clickTime = currentTime + beatToTime(click.beat - this.currentBeat);
       this.scheduleClick(clickTime, click);
     }
 
