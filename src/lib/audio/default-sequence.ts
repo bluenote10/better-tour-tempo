@@ -12,7 +12,7 @@ export function create2To1RatioSequence(): Sequence {
   clicks.push({ soundType: "synth2", beat: 3, volume: 1.0 });
 
   for (const b of range(8)) {
-    clicks.push({ soundType: "synth2", beat: b, volume: 0.1 });
+    clicks.push({ soundType: "hi-hat1", beat: b, volume: 0.1 });
   }
 
   return {
@@ -29,7 +29,7 @@ export function create3To1RatioSequence(): Sequence {
   clicks.push({ soundType: "synth2", beat: 4, volume: 1.0 });
 
   for (const b of range(8)) {
-    clicks.push({ soundType: "synth2", beat: b, volume: 0.1 });
+    clicks.push({ soundType: "hi-hat1", beat: b, volume: 0.1 });
   }
 
   return {

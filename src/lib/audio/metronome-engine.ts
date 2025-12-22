@@ -5,15 +5,13 @@
 
 import { generateClickBuffer } from "./generate-click";
 import { ClickIterator } from "./click-iterator";
-import type { Sequence } from "./sequence";
-
-export type SoundType = "synth1" | "synth2" | "sample";
+import type { Sequence, ClickType, BufferBasedClickType, FileBasedClickType } from "./sequence";
+import { assertNever } from "$lib/typing-utils";
 
 export class MetronomeEngine {
   private readonly audioContext: AudioContext;
   private readonly masterGain: GainNode;
-  private readonly generatedClickBuffer: AudioBuffer;
-  private readonly sampleClickBuffer: AudioBuffer;
+  private readonly buffers: Map<BufferBasedClickType, AudioBuffer>;
   private readonly clickIterator: ClickIterator;
 
   private schedulerIntervalId: number | null = null;
@@ -31,14 +29,12 @@ export class MetronomeEngine {
   private constructor(
     audioContext: AudioContext,
     masterGain: GainNode,
-    generatedClickBuffer: AudioBuffer,
-    sampleClickBuffer: AudioBuffer,
+    buffers: Map<BufferBasedClickType, AudioBuffer>,
     sequence: Sequence,
   ) {
     this.audioContext = audioContext;
     this.masterGain = masterGain;
-    this.generatedClickBuffer = generatedClickBuffer;
-    this.sampleClickBuffer = sampleClickBuffer;
+    this.buffers = buffers;
     this.clickIterator = new ClickIterator(sequence);
   }
 
@@ -48,19 +44,89 @@ export class MetronomeEngine {
     masterGain.connect(audioContext.destination);
     masterGain.gain.value = initialVolume;
 
-    const generatedClickBuffer = generateClickBuffer(audioContext);
-    const sampleClickBuffer = await MetronomeEngine.loadClickSample(
-      audioContext,
-      "/548508__ludwigmueller__perc_clicktoy_hi.wav",
+    const buffers = new Map<BufferBasedClickType, AudioBuffer>();
+
+    // Generate synth2 buffer
+    buffers.set("synth2", generateClickBuffer(audioContext));
+
+    // Load all file-based samples
+    const fileBasedTypes: FileBasedClickType[] = [
+      "hi-hat1",
+      "hi-hat2",
+      "hi-hat3",
+      "hi-hat4",
+      "hi-hat5",
+      "hi-hat6",
+      "perc_clicktoy",
+      "perc_glass",
+      "perc_metronomequartz",
+      "perc_stick",
+      "synth_block_e",
+      "synth_square_d",
+      "synth_square_e",
+      "synth_tick_b",
+      "synth_tick_c",
+      "synth_tick_e",
+      "synth_tick_h",
+    ];
+
+    await Promise.all(
+      fileBasedTypes.map(async (clickType) => {
+        const url = MetronomeEngine.getFileUrl(clickType);
+        try {
+          const buffer = await MetronomeEngine.loadClickSample(audioContext, url);
+          buffers.set(clickType, buffer);
+        } catch (error) {
+          console.warn(
+            `Failed to load audio file for ${clickType} from ${url} (will be unavailable):`,
+            error,
+          );
+        }
+      }),
     );
 
-    return new MetronomeEngine(
-      audioContext,
-      masterGain,
-      generatedClickBuffer,
-      sampleClickBuffer,
-      sequence,
-    );
+    return new MetronomeEngine(audioContext, masterGain, buffers, sequence);
+  }
+
+  private static getFileUrl(clickType: FileBasedClickType): string {
+    switch (clickType) {
+      case "hi-hat1":
+        return "/185211__casmarrav__retro-hi-hat.wav";
+      case "hi-hat2":
+        return "/203348__klemmy__12-typhoonb.wav";
+      case "hi-hat3":
+        return "/219614__ani_music__filtered-closed-hi-hat-hhclfilt_1a.wav";
+      case "hi-hat4":
+        return "/554650__0ai__hat.wav";
+      case "hi-hat5":
+        return "/674296__theendofacycle__hi-hat-closed-hit-clean.wav";
+      case "hi-hat6":
+        return "/78812__matiasromero__hi-hat2-waldir.wav";
+      case "perc_clicktoy":
+        return "/548508__ludwigmueller__perc_clicktoy_hi.wav";
+      case "perc_glass":
+        return "/548510__ludwigmueller__perc_glass_hi.wav";
+      case "perc_metronomequartz":
+        return "/548518__ludwigmueller__perc_metronomequartz_hi.wav";
+      case "perc_stick":
+        return "/548530__ludwigmueller__perc_stick_hi.wav";
+      case "synth_block_e":
+        return "/548562__ludwigmueller__synth_block_e_hi.wav";
+      case "synth_square_d":
+        return "/548588__ludwigmueller__synth_square_d_hi.wav";
+      case "synth_square_e":
+        return "/548590__ludwigmueller__synth_square_e_hi.wav";
+      case "synth_tick_b":
+        return "/548594__ludwigmueller__synth_tick_b_hi.wav";
+      case "synth_tick_c":
+        return "/548596__ludwigmueller__synth_tick_c_hi.wav";
+      case "synth_tick_e":
+        return "/548600__ludwigmueller__synth_tick_e_hi.wav";
+      case "synth_tick_h":
+        return "/548606__ludwigmueller__synth_tick_h_hi.wav";
+      default:
+        return assertNever(clickType);
+    }
   }
 
   private static async loadClickSample(
@@ -156,13 +222,16 @@ export class MetronomeEngine {
     this.lastScheduleTime = currentTime;
   }
 
-  private scheduleClick(time: number, click: { soundType: SoundType; volume: number }): void {
-    const buffer =
-      click.soundType === "synth2" ? this.generatedClickBuffer : this.sampleClickBuffer;
+  private scheduleClick(time: number, click: { soundType: ClickType; volume: number }): void {
+    const clickType = click.soundType;
 
-    if (click.soundType === "synth1") {
+    if (clickType === "synth1") {
       this.playSynthClick(time, click.volume);
     } else {
+      const buffer = this.buffers.get(clickType);
+      if (!buffer) {
+        throw new Error(`Buffer not found for click type: ${clickType}`);
+      }
       this.playBufferClick(time, buffer, click.volume);
     }
   }

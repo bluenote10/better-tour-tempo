@@ -211,7 +211,7 @@ describe("ClickIterator", () => {
         clicks: [
           { soundType: "synth1", beat: 0, volume: 0.5 },
           { soundType: "synth2", beat: 1, volume: 0.8 },
-          { soundType: "sample", beat: 2, volume: 1.0 },
+          { soundType: "hi-hat1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
       };
@@ -223,7 +223,7 @@ describe("ClickIterator", () => {
       expect(clicks[0].volume).toBe(0.5);
       expect(clicks[1].soundType).toBe("synth2");
       expect(clicks[1].volume).toBe(0.8);
-      expect(clicks[2].soundType).toBe("sample");
+      expect(clicks[2].soundType).toBe("hi-hat1");
       expect(clicks[2].volume).toBe(1.0);
     });
   });
