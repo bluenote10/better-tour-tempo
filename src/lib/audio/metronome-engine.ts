@@ -51,7 +51,7 @@ export class MetronomeEngine {
     const generatedClickBuffer = generateClickBuffer(audioContext);
     const sampleClickBuffer = await MetronomeEngine.loadClickSample(
       audioContext,
-      "/548508__perc_clicktoy_hi.wav",
+      "/548508__ludwigmueller__perc_clicktoy_hi.wav",
     );
 
     return new MetronomeEngine(
