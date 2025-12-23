@@ -60,7 +60,11 @@ export class MetronomeEngine {
     await Promise.all(
       FILE_BASED_TYPES.map(async (clickType) => {
         const filename = MetronomeEngine.getSampleFilename(clickType);
-        const url = asset(filename);
+        // I was hoping that `asset(filename)` (from `$app/paths`) would produce a relative URL here so that
+        // it works on GitHub, but apparently the `relative: true` path setting will only mean that `asset`
+        // returns relative paths during server-side rendering, not at runtime. Since we want relative URLs
+        // we have to generate them manually.
+        const url = `./${filename}`;
         try {
           const buffer = await MetronomeEngine.loadClickSample(audioContext, url);
           buffers.set(clickType, buffer);
