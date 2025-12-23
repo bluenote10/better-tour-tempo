@@ -13,7 +13,6 @@ import {
   type Click,
 } from "./sequence";
 import { assertNever } from "$lib/typing-utils";
-import { asset } from "$app/paths";
 
 export class MetronomeEngine {
   private readonly audioContext: AudioContext;
