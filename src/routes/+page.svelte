@@ -14,14 +14,14 @@
     metronome.updateVolume(Number(target.value));
   }
 
-  function handleBackwardSwingChange(e: Event) {
+  function handleBackswingChange(e: Event) {
     const target = e.target as HTMLInputElement;
-    swingState.setBackwardSwingMs(Number(target.value));
+    swingState.setBackswingTimeMs(Number(target.value));
   }
 
-  function handleForwardSwingChange(e: Event) {
+  function handleDownswingChange(e: Event) {
     const target = e.target as HTMLInputElement;
-    swingState.setForwardSwingMs(Number(target.value));
+    swingState.setDownswingTimeMs(Number(target.value));
   }
 
   const presets2to1 = [5, 6, 7, 8, 9, 10];
@@ -60,16 +60,16 @@
       <div class="rounded-lg bg-gray-50 p-6">
         <div class="grid grid-cols-2 gap-4 text-center">
           <div>
-            <div class="text-sm text-gray-600">Backward Swing</div>
-            <div class="text-3xl font-bold">{Math.round(swingState.backwardSwingMs)} ms</div>
+            <div class="text-sm text-gray-600">Backswing</div>
+            <div class="text-3xl font-bold">{Math.round(swingState.backswingTimeMs)} ms</div>
           </div>
           <div>
-            <div class="text-sm text-gray-600">Forward Swing</div>
-            <div class="text-3xl font-bold">{Math.round(swingState.forwardSwingMs)} ms</div>
+            <div class="text-sm text-gray-600">Downswing</div>
+            <div class="text-3xl font-bold">{Math.round(swingState.downswingTimeMs)} ms</div>
           </div>
           <div>
             <div class="text-sm text-gray-600">Total Time</div>
-            <div class="text-3xl font-bold">{Math.round(swingState.totalSwingMs)} ms</div>
+            <div class="text-3xl font-bold">{Math.round(swingState.totalSwingTimeMs)} ms</div>
           </div>
           <div>
             <div class="text-sm text-gray-600">BPM</div>
@@ -80,18 +80,18 @@
 
       <!-- Timing Sliders -->
       <div class="space-y-4">
-        <!-- Backward Swing Slider -->
+        <!-- Backswing Slider -->
         <div>
-          <label for="backward" class="mb-2 block text-sm font-medium">
-            Backward Swing: {Math.round(swingState.backwardSwingMs)} ms
+          <label for="backswing" class="mb-2 block text-sm font-medium">
+            Backswing: {Math.round(swingState.backswingTimeMs)} ms
           </label>
           <input
-            id="backward"
+            id="backswing"
             type="range"
             min="200"
             max="2000"
-            value={swingState.backwardSwingMs}
-            oninput={handleBackwardSwingChange}
+            value={swingState.backswingTimeMs}
+            oninput={handleBackswingChange}
             class="w-full"
           />
           <div class="mt-1 flex justify-between text-xs text-gray-500">
@@ -100,18 +100,18 @@
           </div>
         </div>
 
-        <!-- Forward Swing Slider -->
+        <!-- Downswing Slider -->
         <div>
-          <label for="forward" class="mb-2 block text-sm font-medium">
-            Forward Swing: {Math.round(swingState.forwardSwingMs)} ms
+          <label for="downswing" class="mb-2 block text-sm font-medium">
+            Downswing: {Math.round(swingState.downswingTimeMs)} ms
           </label>
           <input
-            id="forward"
+            id="downswing"
             type="range"
             min="100"
             max="1000"
-            value={swingState.forwardSwingMs}
-            oninput={handleForwardSwingChange}
+            value={swingState.downswingTimeMs}
+            oninput={handleDownswingChange}
             class="w-full"
           />
           <div class="mt-1 flex justify-between text-xs text-gray-500">
@@ -126,23 +126,23 @@
         <div class="mb-2 block text-sm font-medium">Presets</div>
         {#if swingState.ratioMode === 2}
           <div class="grid grid-cols-6 gap-2">
-            {#each presets2to1 as forward (forward)}
+            {#each presets2to1 as downswingFrames (downswingFrames)}
               <button
-                onclick={() => swingState.loadPreset(forward)}
+                onclick={() => swingState.loadPreset(downswingFrames)}
                 class="rounded bg-gray-200 py-2 text-sm font-medium transition-colors hover:bg-gray-300"
               >
-                {forward * 2}/{forward}
+                {downswingFrames * 2}/{downswingFrames}
               </button>
             {/each}
           </div>
         {:else}
           <div class="grid grid-cols-6 gap-2">
-            {#each presets3to1 as forward (forward)}
+            {#each presets3to1 as downswingFrames (downswingFrames)}
               <button
-                onclick={() => swingState.loadPreset(forward)}
+                onclick={() => swingState.loadPreset(downswingFrames)}
                 class="rounded bg-gray-200 py-2 text-sm font-medium transition-colors hover:bg-gray-300"
               >
-                {forward * 3}/{forward}
+                {downswingFrames * 3}/{downswingFrames}
               </button>
             {/each}
           </div>

@@ -22,11 +22,11 @@ export function frameNotationToMs(frames: number): number {
 }
 
 /**
- * Calculates backward swing time from forward swing time and ratio.
- * @param forwardSwingMs Forward swing time in milliseconds
+ * Calculates backswing time from downswing time and ratio.
+ * @param downswingTimeMs Downswing time in milliseconds
  * @param ratio Ratio mode (2 for 2:1, 3 for 3:1)
- * @returns Backward swing time in milliseconds
+ * @returns Backswing time in milliseconds
  */
-export function getBackwardSwingTime(forwardSwingMs: number, ratio: 2 | 3): number {
-  return forwardSwingMs * ratio;
+export function getBackswingTimeMs(downswingTimeMs: number, ratio: 2 | 3): number {
+  return downswingTimeMs * ratio;
 }
