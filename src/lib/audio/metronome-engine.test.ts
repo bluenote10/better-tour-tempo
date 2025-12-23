@@ -8,9 +8,7 @@ describe("MetronomeEngine", () => {
   describe("getFileUrl", () => {
     it("should return existing file paths for all FileBasedClickType values", () => {
       for (const clickType of FILE_BASED_TYPES) {
-        const url = MetronomeEngine.getFileUrl(clickType);
-        // Remove leading slash to get relative path from static folder
-        const filename = url.substring(1);
+        const filename = MetronomeEngine.getSampleFilename(clickType);
         const filepath = join(process.cwd(), "static", filename);
 
         expect(existsSync(filepath), `File should exist: ${filepath}`).toBe(true);

@@ -13,6 +13,7 @@ import {
   type Click,
 } from "./sequence";
 import { assertNever } from "$lib/typing-utils";
+import { asset } from "$app/paths";
 
 export class MetronomeEngine {
   private readonly audioContext: AudioContext;
@@ -58,7 +59,8 @@ export class MetronomeEngine {
     // Load all file-based samples
     await Promise.all(
       FILE_BASED_TYPES.map(async (clickType) => {
-        const url = MetronomeEngine.getFileUrl(clickType);
+        const filename = MetronomeEngine.getSampleFilename(clickType);
+        const url = asset(filename);
         try {
           const buffer = await MetronomeEngine.loadClickSample(audioContext, url);
           buffers.set(clickType, buffer);
@@ -74,42 +76,42 @@ export class MetronomeEngine {
     return new MetronomeEngine(audioContext, masterGain, buffers, sequence);
   }
 
-  static getFileUrl(clickType: FileBasedClickType): string {
+  static getSampleFilename(clickType: FileBasedClickType): string {
     switch (clickType) {
       case "hi-hat1":
-        return "/185211__casmarrav__retro-hi-hat.wav";
+        return "185211__casmarrav__retro-hi-hat.wav";
       case "hi-hat2":
-        return "/203348__klemmy__12-typhoonb.wav";
+        return "203348__klemmy__12-typhoonb.wav";
       case "hi-hat3":
-        return "/219614__ani_music__filtered-closed-hi-hat-hhclfilt_1a.wav";
+        return "219614__ani_music__filtered-closed-hi-hat-hhclfilt_1a.wav";
       case "hi-hat4":
-        return "/554650__0ai__hat.wav";
+        return "554650__0ai__hat.wav";
       case "hi-hat5":
-        return "/674296__theendofacycle__hi-hat-closed-hit-clean.wav";
+        return "674296__theendofacycle__hi-hat-closed-hit-clean.wav";
       case "hi-hat6":
-        return "/78812__matiasromero__hi-hat2-waldir.wav";
+        return "78812__matiasromero__hi-hat2-waldir.wav";
       case "perc_clicktoy":
-        return "/548508__ludwigmueller__perc_clicktoy_hi.wav";
+        return "548508__ludwigmueller__perc_clicktoy_hi.wav";
       case "perc_glass":
-        return "/548510__ludwigmueller__perc_glass_hi.wav";
+        return "548510__ludwigmueller__perc_glass_hi.wav";
       case "perc_metronomequartz":
-        return "/548518__ludwigmueller__perc_metronomequartz_hi.wav";
+        return "548518__ludwigmueller__perc_metronomequartz_hi.wav";
       case "perc_stick":
-        return "/548530__ludwigmueller__perc_stick_hi.wav";
+        return "548530__ludwigmueller__perc_stick_hi.wav";
       case "synth_block_e":
-        return "/548562__ludwigmueller__synth_block_e_hi.wav";
+        return "548562__ludwigmueller__synth_block_e_hi.wav";
       case "synth_square_d":
-        return "/548588__ludwigmueller__synth_square_d_hi.wav";
+        return "548588__ludwigmueller__synth_square_d_hi.wav";
       case "synth_square_e":
-        return "/548590__ludwigmueller__synth_square_e_hi.wav";
+        return "548590__ludwigmueller__synth_square_e_hi.wav";
       case "synth_tick_b":
-        return "/548594__ludwigmueller__synth_tick_b_hi.wav";
+        return "548594__ludwigmueller__synth_tick_b_hi.wav";
       case "synth_tick_c":
-        return "/548596__ludwigmueller__synth_tick_c_hi.wav";
+        return "548596__ludwigmueller__synth_tick_c_hi.wav";
       case "synth_tick_e":
-        return "/548600__ludwigmueller__synth_tick_e_hi.wav";
+        return "548600__ludwigmueller__synth_tick_e_hi.wav";
       case "synth_tick_h":
-        return "/548606__ludwigmueller__synth_tick_h_hi.wav";
+        return "548606__ludwigmueller__synth_tick_h_hi.wav";
       default:
         return assertNever(clickType);
     }
