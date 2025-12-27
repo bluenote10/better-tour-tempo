@@ -27,7 +27,7 @@ class SwingState {
   }
 
   get currentSequence(): Sequence {
-    return this.ratioMode === 2 ? create2To1RatioSequence() : create3To1RatioSequence();
+    return this.ratioMode === 2 ? create2To1RatioSequence(false) : create3To1RatioSequence(true);
   }
 
   async setRatioMode(mode: 2 | 3): Promise<void> {
