@@ -4,8 +4,7 @@
   import { swingState } from "$lib/swing-state.svelte";
 
   onMount(async () => {
-    await metronome.init();
-    await metronome.switchSequence(swingState.currentSequence);
+    await metronome.init(swingState.currentSequence);
     metronome.updateBPM(swingState.internalBPM);
   });
 
@@ -76,6 +75,19 @@
             <div class="text-3xl font-bold">{Math.round(swingState.displayBPM)}</div>
           </div>
         </div>
+      </div>
+
+      <!-- Emphasize Impact Checkbox -->
+      <div>
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={swingState.emphasizeImpact}
+            onchange={(e) => swingState.setEmphasizeImpact((e.target as HTMLInputElement).checked)}
+            class="h-4 w-4"
+          />
+          <span class="text-sm font-medium">Emphasize Impact</span>
+        </label>
       </div>
 
       <!-- Timing Sliders -->

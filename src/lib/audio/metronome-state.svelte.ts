@@ -1,5 +1,4 @@
 import { MetronomeEngine } from "./metronome-engine";
-import { create3To1RatioSequence } from "./generate-sequence";
 import type { Sequence } from "./sequence";
 
 /**
@@ -12,9 +11,8 @@ class MetronomeState {
   volume = $state(1.0);
   isPlaying = $state(false);
 
-  async init(): Promise<void> {
+  async init(sequence: Sequence): Promise<void> {
     if (!this.engine) {
-      const sequence = create3To1RatioSequence();
       this.engine = await MetronomeEngine.create(this.volume, sequence);
     }
   }

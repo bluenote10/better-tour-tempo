@@ -1,7 +1,6 @@
 import { metronome } from "./audio/metronome-state.svelte";
 import { create2To1RatioSequence, create3To1RatioSequence } from "./audio/generate-sequence";
 import { msToBPM, frameNotationToMs } from "./audio/timing-utils";
-import type { Sequence } from "./audio/sequence";
 
 /**
  * Swing timing UI state management
@@ -9,6 +8,13 @@ import type { Sequence } from "./audio/sequence";
 class SwingState {
   ratioMode = $state<2 | 3>(3);
   downswingTimeMs = $state(frameNotationToMs(7)); // Default: 21/7 preset
+  emphasizeImpact = $state(true);
+
+  currentSequence = $derived(
+    this.ratioMode === 2
+      ? create2To1RatioSequence(this.emphasizeImpact)
+      : create3To1RatioSequence(this.emphasizeImpact),
+  );
 
   get backswingTimeMs(): number {
     return this.downswingTimeMs * this.ratioMode;
@@ -24,10 +30,6 @@ class SwingState {
 
   get displayBPM(): number {
     return msToBPM(this.totalSwingTimeMs);
-  }
-
-  get currentSequence(): Sequence {
-    return this.ratioMode === 2 ? create2To1RatioSequence(false) : create3To1RatioSequence(true);
   }
 
   async setRatioMode(mode: 2 | 3): Promise<void> {
@@ -53,6 +55,11 @@ class SwingState {
   async setBackswingTimeMs(ms: number): Promise<void> {
     this.downswingTimeMs = ms / this.ratioMode;
     metronome.updateBPM(this.internalBPM);
+  }
+
+  async setEmphasizeImpact(value: boolean): Promise<void> {
+    this.emphasizeImpact = value;
+    await metronome.switchSequence(this.currentSequence);
   }
 
   async loadPreset(downswingFrames: number): Promise<void> {
