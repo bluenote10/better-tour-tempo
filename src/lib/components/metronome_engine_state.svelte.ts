@@ -4,7 +4,7 @@ import type { Sequence } from "../sequence";
 /**
  * Svelte 5 runes-based state management for metronome
  */
-class MetronomeState {
+class MetronomeEngineState {
   private engine: MetronomeEngine | null = null;
 
   bpm = $state(120);
@@ -69,4 +69,4 @@ class MetronomeState {
   }
 }
 
-export const metronome = new MetronomeState();
+export const metronomeEngineState = new MetronomeEngineState();

@@ -1,10 +1,16 @@
 <script lang="ts">
-  import { metronome } from "$lib/components/metronome_state.svelte";
+  import { onMount } from "svelte";
+  import { metronomeEngineState } from "$lib/components/metronome_engine_state.svelte";
   import { swingState } from "$lib/components/swing_state.svelte";
+
+  onMount(async () => {
+    await metronomeEngineState.init(swingState.currentSequence);
+    metronomeEngineState.updateBPM(swingState.internalBPM);
+  });
 
   function handleVolumeChange(e: Event) {
     const target = e.target as HTMLInputElement;
-    metronome.updateVolume(Number(target.value));
+    metronomeEngineState.updateVolume(Number(target.value));
   }
 
   function handleBackswingChange(e: Event) {
@@ -158,7 +164,7 @@
       <!-- Volume Control -->
       <div>
         <label for="volume" class="mb-2 block text-sm font-medium">
-          Volume: {Math.round(metronome.volume * 100)}%
+          Volume: {Math.round(metronomeEngineState.volume * 100)}%
         </label>
         <input
           id="volume"
@@ -166,7 +172,7 @@
           min="0"
           max="2.0"
           step="0.01"
-          value={metronome.volume}
+          value={metronomeEngineState.volume}
           oninput={handleVolumeChange}
           class="w-full"
         />
@@ -178,12 +184,12 @@
 
       <!-- Play/Stop Button -->
       <button
-        onclick={() => metronome.togglePlay()}
-        class="w-full rounded py-4 text-xl font-bold {metronome.isPlaying
+        onclick={() => metronomeEngineState.togglePlay()}
+        class="w-full rounded py-4 text-xl font-bold {metronomeEngineState.isPlaying
           ? 'bg-red-500 hover:bg-red-600'
           : 'bg-green-500 hover:bg-green-600'} text-white transition-colors"
       >
-        {metronome.isPlaying ? "Stop" : "Start"}
+        {metronomeEngineState.isPlaying ? "Stop" : "Start"}
       </button>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { metronome } from "./metronome_state.svelte";
+import { metronomeEngineState } from "./metronome_engine_state.svelte";
 import { create2To1RatioSequence, create3To1RatioSequence } from "../sequence_generation";
 import { msToBPM, frameNotationToMs } from "../timing_utils";
 
@@ -43,23 +43,23 @@ class SwingState {
     const divisor = mode + 1;
     this.downswingTimeMs = currentTotal / divisor;
 
-    await metronome.switchSequence(this.currentSequence);
-    metronome.updateBPM(this.internalBPM);
+    await metronomeEngineState.switchSequence(this.currentSequence);
+    metronomeEngineState.updateBPM(this.internalBPM);
   }
 
   async setDownswingTimeMs(ms: number): Promise<void> {
     this.downswingTimeMs = ms;
-    metronome.updateBPM(this.internalBPM);
+    metronomeEngineState.updateBPM(this.internalBPM);
   }
 
   async setBackswingTimeMs(ms: number): Promise<void> {
     this.downswingTimeMs = ms / this.ratioMode;
-    metronome.updateBPM(this.internalBPM);
+    metronomeEngineState.updateBPM(this.internalBPM);
   }
 
   async setEmphasizeImpact(value: boolean): Promise<void> {
     this.emphasizeImpact = value;
-    await metronome.switchSequence(this.currentSequence);
+    await metronomeEngineState.switchSequence(this.currentSequence);
   }
 
   async loadPreset(downswingFrames: number): Promise<void> {
