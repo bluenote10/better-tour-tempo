@@ -1,5 +1,5 @@
-import { MetronomeEngine } from "./metronome-engine";
-import type { Sequence } from "./sequence";
+import { MetronomeEngine } from "../metronome_engine";
+import type { Sequence } from "../sequence";
 
 /**
  * Svelte 5 runes-based state management for metronome

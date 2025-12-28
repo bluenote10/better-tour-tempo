@@ -3,8 +3,8 @@
  * Uses look-ahead scheduling for sub-millisecond accuracy
  */
 
-import { generateClickBuffer } from "./generate-click";
-import { ClickIterator } from "./click-iterator";
+import { generateClickBuffer } from "./sample_generation";
+import { ClickIterator } from "./click_iterator";
 import {
   type Sequence,
   type BufferBasedClickType,
@@ -12,7 +12,7 @@ import {
   FILE_BASED_TYPES,
   type Click,
 } from "./sequence";
-import { assertNever } from "$lib/typing-utils";
+import { assertNever } from "$lib/typing_utils";
 
 export class MetronomeEngine {
   private readonly audioContext: AudioContext;

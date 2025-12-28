@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { MetronomeEngine } from "./metronome-engine";
+import { MetronomeEngine } from "./metronome_engine";
 import { FILE_BASED_TYPES } from "./sequence";
 import { existsSync } from "fs";
 import { join } from "path";

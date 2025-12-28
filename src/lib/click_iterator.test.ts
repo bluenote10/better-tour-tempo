@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ClickIterator } from "./click-iterator";
+import { ClickIterator } from "./click_iterator";
 import type { Sequence } from "./sequence";
 
 describe("ClickIterator", () => {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { metronome } from "$lib/audio/metronome-state.svelte";
-  import { swingState } from "$lib/swing-state.svelte";
+  import { metronome } from "$lib/components/metronome_state.svelte";
+  import { swingState } from "$lib/components/swing_state.svelte";
 
   onMount(async () => {
     await metronome.init(swingState.currentSequence);

@@ -1,10 +1,9 @@
-import { metronome } from "./audio/metronome-state.svelte";
-import { create2To1RatioSequence, create3To1RatioSequence } from "./audio/generate-sequence";
-import { msToBPM, frameNotationToMs } from "./audio/timing-utils";
+import { metronome } from "./metronome_state.svelte";
+import { create2To1RatioSequence, create3To1RatioSequence } from "../sequence_generation";
+import { msToBPM, frameNotationToMs } from "../timing_utils";
 
 /**
- * Swing timing UI state management
- */
+ * Swing timing UI state management */
 class SwingState {
   ratioMode = $state<2 | 3>(3);
   downswingTimeMs = $state(frameNotationToMs(7)); // Default: 21/7 preset
