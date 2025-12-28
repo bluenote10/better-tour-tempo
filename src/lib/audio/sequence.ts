@@ -31,6 +31,7 @@ export interface Click {
 export interface Sequence {
   clicks: Click[];
   maxBeat: number;
+  perceivedBpmBeats: number;
 }
 
 export const FILE_BASED_TYPES: FileBasedClickType[] = [

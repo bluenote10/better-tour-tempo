@@ -12,6 +12,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -37,6 +38,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -52,6 +54,7 @@ describe("ClickIterator", () => {
       const sequence: Sequence = {
         clicks: [{ type: "synth1", beat: 2, volume: 1.0 }],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -67,6 +70,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -85,6 +89,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 3, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -110,6 +115,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -131,6 +137,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 2,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -147,6 +154,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 2,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -162,6 +170,7 @@ describe("ClickIterator", () => {
       const sequence: Sequence = {
         clicks: [],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -173,6 +182,7 @@ describe("ClickIterator", () => {
       const sequence: Sequence = {
         clicks: [{ type: "synth1", beat: 0, volume: 1.0 }],
         maxBeat: 0,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -184,6 +194,7 @@ describe("ClickIterator", () => {
       const sequence: Sequence = {
         clicks: [{ type: "synth1", beat: 0, volume: 1.0 }],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -199,6 +210,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 3.99, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -214,6 +226,7 @@ describe("ClickIterator", () => {
           { type: "hi-hat1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -236,6 +249,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -256,6 +270,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 1, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);
@@ -282,6 +297,7 @@ describe("ClickIterator", () => {
           { type: "synth1", beat: 2, volume: 1.0 },
         ],
         maxBeat: 4,
+        perceivedBpmBeats: 1,
       };
 
       const iterator = new ClickIterator(sequence);

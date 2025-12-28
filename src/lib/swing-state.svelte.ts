@@ -28,8 +28,8 @@ class SwingState {
     return msToBPM(this.downswingTimeMs);
   }
 
-  get displayBPM(): number {
-    return msToBPM(this.totalSwingTimeMs);
+  get perceivedBPM(): number {
+    return msToBPM(this.downswingTimeMs * this.currentSequence.perceivedBpmBeats);
   }
 
   async setRatioMode(mode: 2 | 3): Promise<void> {

@@ -71,8 +71,8 @@
             <div class="text-3xl font-bold">{Math.round(swingState.totalSwingTimeMs)} ms</div>
           </div>
           <div>
-            <div class="text-sm text-gray-600">BPM</div>
-            <div class="text-3xl font-bold">{Math.round(swingState.displayBPM)}</div>
+            <div class="text-sm text-gray-600">Perceived BPM</div>
+            <div class="text-3xl font-bold">{Math.round(swingState.perceivedBPM)}</div>
           </div>
         </div>
       </div>
